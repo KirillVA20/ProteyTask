@@ -17,19 +17,37 @@ interface ItemActionsTypes {
 
 type TaskListProps = ItemActionsTypes & TaskListTypes;
 
-function TaskList(props:TaskListProps) {
+/** 
+  * Компонент-список, хранящий в себе компоненты-задачи
+  * @param {Object} taskData - объект со всеми существующими задачами
+  * @param {Array} orderData - массив, определяющий очередь вывода задач
+*/
+function TaskList({
+    taskData,
+    orderData,
+    deleteItemAction,
+    getTaskListAction,
+    changeOpenModal,
+    updateTaskDone,
+    changeTaskPosition
+}:TaskListProps) {
+
+    /** 
+     * Рендер всех существующих задач
+    */
     const renderTaskItems = ():Array<ReactNode> => {
         let taskList:Array<ReactNode> = [];
 
-        props.orderData.forEach((id:string) => {
+        //Пробегаемся по массиву очереди, в которой добавляем задачу в массив
+        orderData.forEach((id:string) => {
             taskList.push(
                 <TaskItem key={id} 
-                          {...props.taskData[id]}
-                          deleteItem={props.deleteItemAction}
-                          updateTaskDone={props.updateTaskDone}
-                          changeTaskPosition={props.changeTaskPosition}
-                          changeOpenModal={props.changeOpenModal}
-                          taskListLenght={props.orderData.length - 1}
+                          {...taskData[id]}
+                          deleteItem={deleteItemAction}
+                          updateTaskDone={updateTaskDone}
+                          changeTaskPosition={changeTaskPosition}
+                          changeOpenModal={changeOpenModal}
+                          taskListLenght={orderData.length - 1}
                 />
             );
         });
@@ -37,16 +55,20 @@ function TaskList(props:TaskListProps) {
         return taskList;
     }
 
+    /** 
+     * Начальное получение списка всех задач с localStorage
+    */
     useEffect(() => {
-        props.getTaskListAction();
+        getTaskListAction();
     }, []);
 
     return (
         <section className="task-list">
             <div className="task-list__container">
                 {renderTaskItems()}
+                {/* Кнопка добавления новой задачи */}
                 <Tooltip text="Создать задачу" position="bottom">
-                   <AddItemButton changeOpenModal={props.changeOpenModal}/>
+                   <AddItemButton changeOpenModal={changeOpenModal}/>
                 </Tooltip>
             </div>
         </section>

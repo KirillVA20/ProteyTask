@@ -8,9 +8,12 @@ interface AddButtonActionTypes {
     changeOpenModal(openModal:boolean, editTask:string): void,
 }
 
-const AddItemButton = (props:AddButtonActionTypes) => 
+/** 
+  * Кнопка открытия модального окна добавления задачи
+*/
+const AddItemButton = ({changeOpenModal}:AddButtonActionTypes) => 
     <div className="add-item-button"
-         onClick={() => props.changeOpenModal(true, '')}
+         onClick={() => changeOpenModal(true, '')}
     >
         <FontAwesomeIcon icon={faPlus} />
     </div>

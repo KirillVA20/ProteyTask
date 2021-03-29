@@ -13,6 +13,11 @@ export enum ItemsTypes {
     UPDATE_TASK_DONE = 'UPDATE_TASK_DONE'
 }
 
+export enum ModalTypes {
+    CHANGE_OPEN_MODAL = 'CHANGE_OPEN_MODAL'
+}
+
+
 export interface TaskTypes {
     id: string,
     name:string,
@@ -51,8 +56,4 @@ export interface ModalActionDataTypes {
 export interface ModalActionTypes {
     type: string,
     payload: ModalActionDataTypes,
-}
-
-export enum ModalTypes {
-    CHANGE_OPEN_MODAL = 'CHANGE_OPEN_MODAL'
 }

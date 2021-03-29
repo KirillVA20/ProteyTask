@@ -12,6 +12,7 @@ const initialState:InitialStateTypes = {
 
 export default function modal(state=initialState, action:ModalActionTypes):InitialStateTypes {
     switch (action.type) {
+        //Изменение состояния активности модального окна
         case ModalTypes.CHANGE_OPEN_MODAL :
             return {
                 ...state,

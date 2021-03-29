@@ -22,25 +22,49 @@ interface ModalStoreTypes {
 
 type ItemModalProps = TaskListTypes & ModalActionsTypes & ModalStoreTypes
 
-function ItemModal(props:ItemModalProps) {
-    const taskId = props.editTask, 
-          taskData = (taskId) ? props.taskData[taskId] : null,
+/** 
+  * Модальное окно для создания/редактирования задачи
+  * @param {string} editTask - id редактируемой задачи
+  * @param {Object} taskData - объект со всеми задачами
+  * @param {Array} orderData - массив с очередью задач
+*/
+function ItemModal({
+    editTask,
+    taskData,
+    orderData,
+    changeOpenModal,
+    addTaskAction,
+    editTaskAction
+}:ItemModalProps) {
+    const taskId = editTask, 
+          taskDataObj = (taskId) ? taskData[taskId] : null,
           taskNameRef = useRef(),
           taskDescriptionRef = useRef(),
           taskOrderRef = useRef(),
           taskDoneRef = useRef();
     
+    /**
+     * Создание нового объекта данных для задачи 
+     * и отправка на сохранение/редактирование в хранилище 
+     * данных 
+    */
     const submitTaskForm = () => {
         const newTaskData = createNewTaskData();
 
+        //Если есть id задачи, значит, нужно вызвать функцию редактирования
+        //В противном случае - функцию создания
         if (taskId)
-            props.editTaskAction(newTaskData);
+            editTaskAction(newTaskData);
         else
-            props.addTaskAction(newTaskData);
+            addTaskAction(newTaskData);
 
-        props.changeOpenModal(false, '');
+        changeOpenModal(false, '');
     }
 
+
+    /**
+     * Формирование нового объекта данных для задачи 
+    */
     const createNewTaskData = ():TaskTypes => {
         const nameInput:HTMLInputElement = taskNameRef.current,
               descriptionInput:HTMLInputElement = taskDescriptionRef.current,
@@ -50,9 +74,11 @@ function ItemModal(props:ItemModalProps) {
                                         ? taskId 
                                         : Math.random().toString(36).substr(2, 9);
 
+        //Если поле с именем осталось пустое - вставляем дефолтное имя
         const nameInputValue = (nameInput.value) 
                                 ? nameInput.value 
                                 : 'Безымянная задача',
+        //Если поле с порядковым номером осталось пустое - вставляем дефолтное значение
               orderInputValue = (orderInput.value)
                                     ? Number.parseInt(orderInput.value) - 1
                                     : 0;
@@ -66,14 +92,20 @@ function ItemModal(props:ItemModalProps) {
         }
     }
 
+    /**
+     * Проверка поля с порядковым номером, чтобы не выводилось значения
+     * выходящее из допустимого диапозона 
+    */
     const checkMaxOrderInput = () => {
         const orderInput:HTMLInputElement = taskOrderRef.current,
               orderInputValue:number = Number.parseInt(orderInput.value),
-              orderDataLenght = props.orderData.length;
+              orderDataLenght = orderData.length;
 
+        //Если введенное значение больше возможного, присваиваем дозволенный максимум
         if (orderInputValue > orderDataLenght)
             orderInput.value = (orderDataLenght + 1).toString();
         
+        //Если значение меньше единицы, присваиваем еденицу
         if (orderInputValue < 1)
             orderInput.value = '1';
     }
@@ -87,6 +119,7 @@ function ItemModal(props:ItemModalProps) {
                 
                 <div className="item-modal__input-container">
 
+                    {/* Поле с названием задачи */}
                     <div className="item-modal__input-wrap">
                         <label htmlFor="name" className="item-modal__label">
                             Название задачи
@@ -95,10 +128,11 @@ function ItemModal(props:ItemModalProps) {
                                type="text" 
                                className="item-modal__input"
                                ref={taskNameRef}
-                               defaultValue={(taskId) ? taskData.name : ''}
+                               defaultValue={(taskId) ? taskDataObj.name : ''}
                         />
                     </div>
 
+                    {/* Поле с описанием задачи */}
                     <div className="item-modal__input-wrap">
                         <label htmlFor="description" className="item-modal__label">
                             Описание задачи
@@ -106,10 +140,11 @@ function ItemModal(props:ItemModalProps) {
                         <textarea name="description" 
                                className="item-modal__textarea"
                                ref={taskDescriptionRef}
-                               defaultValue={(taskId) ? taskData.description : ''}
+                               defaultValue={(taskId) ? taskDataObj.description : ''}
                         />
                     </div>
 
+                    {/* Поле с порядковым номером задачи */}
                     <div className="item-modal__input-wrap">
                         <label htmlFor="order" className="item-modal__label">
                             Порядковый номер задачи
@@ -118,13 +153,14 @@ function ItemModal(props:ItemModalProps) {
                                type="number" 
                                className="item-modal__input"
                                ref={taskOrderRef}
-                               defaultValue={(taskId) ? taskData.ordinalNumber + 1 : 1}
+                               defaultValue={(taskId) ? taskDataObj.ordinalNumber + 1 : 1}
                                min={1}
-                               max={props.orderData.length + 1}
+                               max={orderData.length + 1}
                                onChange={checkMaxOrderInput}
                         />
                     </div>
 
+                    {/* Чекбокс с сотоянимем выполненности задачи */}
                     <div className="item-modal__input-wrap">
                         <label htmlFor="done" className="item-modal__label">
                             Выполнено
@@ -132,20 +168,22 @@ function ItemModal(props:ItemModalProps) {
                         <input name="done" 
                                type="checkbox"
                                ref={taskDoneRef} 
-                               defaultChecked={(taskId) ? taskData.done : false}
+                               defaultChecked={(taskId) ? taskDataObj.done : false}
                         />
                     </div>
 
                 </div>
                 <div className="item-modal__button-panel">
+                    {/* Кнопка сохранения новых данных */}
                     <button className="item-modal__add-button"
                             onClick={() => submitTaskForm()}
                     >
                         Добавить
                     </button>
 
+                     {/* Кнопка закрытия модального окна */}
                     <button className="item-modal__close-button"
-                            onClick={() => props.changeOpenModal(false, '')}
+                            onClick={() => changeOpenModal(false, '')}
                     >
                         <FontAwesomeIcon icon={faTimes}></FontAwesomeIcon>
                     </button>

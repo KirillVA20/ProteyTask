@@ -6,7 +6,8 @@
   "scripts": {
     "test": "test",
     "start": "webpack serve",
-    "build": "webpack --mode=development"
+    "build": "webpack --mode=development",
+    "prod": "webpack --mode=production"
   },
   "author": "Kirill",
   "license": "ISC",
